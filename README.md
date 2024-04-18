@@ -11,6 +11,6 @@ No external libraries required
 
 ```
 git clone https://github.com/ezbooz/Path-of-Exile-divination-cards-flipper-POE
-cd Path-of-Exile-divination-cards-flipper
+cd Path-of-Exile-divination-cards-flipper-POE
 main.py
 ```
