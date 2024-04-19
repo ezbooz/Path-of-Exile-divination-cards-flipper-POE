@@ -90,7 +90,7 @@ def print_results(highscores_sorted):
         for line in data["lines"]:
             if line["currencyTypeName"] == "Divine Orb":
                 divine_orb_value = line["receive"]["value"]
-                print("Значение 'value' в receive для Divine Orb:", divine_orb_value)
+               
         
     for item in highscores_sorted:
         print(item["Name"] + " (" + str(int(item["Cost"])) + " c | " + str(round(item["Profit"] / divine_orb_value, 2)) + " d)")
