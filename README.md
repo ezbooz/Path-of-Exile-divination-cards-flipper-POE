@@ -38,7 +38,8 @@ Online version: https://replit.com/@ezbooz/Path-of-Exile-or-DIVination-flip
 ## Additional Information
 **Acknowledgments:**
 
-  https://poe.ninja/ - for providing divination cards data
+  poe.ninja/ - for providing divination cards data
+  github.com/Lejving - for the script for data collection
 
 **Disclaimer:**
 
