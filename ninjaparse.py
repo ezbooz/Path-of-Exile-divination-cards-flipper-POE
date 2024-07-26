@@ -3,7 +3,7 @@ import json
 from urllib.request import Request, urlopen
 
 def ninjaparse():
-    league_name = "Necropolis"
+    league_name = "settlers"
     urls = {
         'currency': f'https://poe.ninja/api/data/currencyoverview?league={league_name}&type=Currency',
         'div': f'https://poe.ninja/api/data/itemoverview?league={league_name}&type=DivinationCard',
