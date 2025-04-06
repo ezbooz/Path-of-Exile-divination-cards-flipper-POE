@@ -190,7 +190,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
 
-
         main_layout = QVBoxLayout(self.central_widget)
         main_layout.setContentsMargins(15, 15, 15, 15)
         main_layout.setSpacing(15)
@@ -231,14 +230,18 @@ class MainWindow(QMainWindow):
                 color: #e0e0e0;
                 gridline-color: #444;
                 font-size: 12px;
+                alternate-background-color: #2a2a2a;
             }
-            QTableWidget::item {
-                padding: 5px;
-            }
+           QTableWidget::item {
+               padding: 5px;
+               background: transparent;
+               border: none;
+           }
             QTableWidget::item:selected {
                 background-color: #3a3a3a;
                 color: white;
                 border: none; 
+                outline: none;
             }
             QTableWidget::item:focus {
             outline: none;
@@ -267,7 +270,6 @@ class MainWindow(QMainWindow):
 
         button_layout = QHBoxLayout()
         button_layout.setSpacing(10)
-
         self.league_selector = QComboBox()
         self.league_selector.addItems([
             league["name"] for league in self.utils.get_current_leagues()
@@ -284,13 +286,7 @@ class MainWindow(QMainWindow):
             QComboBox:hover {
                 border: 1px solid #4CAF50;
             }
-            QComboBox::drop-down {
-                border: none;
-                background: #444;
-                width: 25px;
-                subcontrol-position: right;
-                subcontrol-origin: padding;
-            }
+
             QComboBox QAbstractItemView {
                 background-color: #333;
                 color: #f0f0f0;
@@ -329,7 +325,7 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(self.button)
 
 
-        self.status_label = QLabel("Ready")
+        self.status_label = QLabel("Choose your league...")
         self.status_label.setStyleSheet("""
             QLabel {
                 color: #aaa;
@@ -413,6 +409,7 @@ class MainWindow(QMainWindow):
 
             self.display_results(highscores_sorted)
             self.status_label.setText("Data loaded successfully")
+
         except Exception as e:
             self.status_label.setText(f"Error: {str(e)}")
 
@@ -471,6 +468,7 @@ class MainWindow(QMainWindow):
 
     def create_table_item(self, row, col, text, align_left=False):
         item = QTableWidgetItem(text)
+        item.setBackground(QColor(0, 0, 0, 0))
         if not align_left:
             item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
         self.table_widget.setItem(row, col, item)
