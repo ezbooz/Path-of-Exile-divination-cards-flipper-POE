@@ -20,6 +20,7 @@ jobs:
     outputs:
       tag_name: ${{ steps.tag.outputs.tag }}
       release_body: ${{ steps.notes.outputs.body }}
+      version: ${{ steps.get_version.outputs.version }}
 
     steps:
     - name: Checkout code
