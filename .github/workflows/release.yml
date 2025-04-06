@@ -5,10 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'main.py'
-      - 'utils/**'
-      - 'poeNinja/**'
-      - 'gui/**'
+      - '__version__.py'
   workflow_dispatch:
 
 permissions:
