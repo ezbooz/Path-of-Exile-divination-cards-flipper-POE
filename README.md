@@ -1,4 +1,4 @@
-![poeFlipper](https://github.com/user-attachments/assets/abbf33e6-8b6f-4605-b49f-87620e82e306)## Path of Exile Divination Cards Flipper (POE)
+## Path of Exile Divination Cards Flipper (POE)
 
 This project provides a tool to assist with flipping divination cards in Path of Exile.
 
