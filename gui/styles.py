@@ -192,11 +192,11 @@ MESSAGE_BOX = """
 """
 
 
-def get_update_message(remote_version, current_version, current_description="") -> str:
+def get_update_message(remote_version, current_version, description) -> str:
     return f"""
-        <p style='font-size:14px;'>A new version (<b>v{remote_version}</b>) is available!</p>
+        <p style='font-size:14px;'><b>A new version (v{remote_version}) is available!</b></p>
         <p style='font-size:13px;'>Current version: v{current_version}</p>
-        <p style='font-size:13px;'><i>What's new in your version:</i><br>{current_description}</p><br>
+        <p style='font-size:13px;'><b>What's new in your version:</b><br>{description }</p><br>
         <p style='font-size:14px;'>Download update: 
         <a href='https://github.com/ezbooz/Path-of-Exile-divination-cards-flipper-POE' 
         style='color:#4CAF50; text-decoration:none;'><b>GitHub Repository</b></a></p>

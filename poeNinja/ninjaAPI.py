@@ -1,4 +1,5 @@
 from typing import Dict, List, Union
+
 from utils.utils import Utils
 
 
@@ -35,14 +36,20 @@ class PoeNinja:
         """
         return {
             "currency": self._build_url("currencyoverview", league_name, "Currency"),
-            "divination": self._build_url("itemoverview", league_name, "DivinationCard"),
+            "divination": self._build_url(
+                "itemoverview", league_name, "DivinationCard"
+            ),
             "uniques": [
                 self._build_url("itemoverview", league_name, unique_type)
                 for unique_type in [
-                    "UniqueMap", "UniqueJewel", "UniqueFlask",
-                    "UniqueWeapon", "UniqueArmour", "UniqueAccessory"
+                    "UniqueMap",
+                    "UniqueJewel",
+                    "UniqueFlask",
+                    "UniqueWeapon",
+                    "UniqueArmour",
+                    "UniqueAccessory",
                 ]
-            ]
+            ],
         }
 
     def _build_url(self, endpoint: str, league_name: str, item_type: str) -> str:

@@ -18,7 +18,7 @@ class Utils:
     ITEM_NAME_MAPPINGS = {
         "Master Cartographer's Sextant": "Awakened Sextant",
         "Charan's Sword": "Oni-Goroshi",
-        "Azyran's Reward": "The Anima Stone"
+        "Azyran's Reward": "The Anima Stone",
     }
 
     def __init__(self):
@@ -72,7 +72,7 @@ class Utils:
             data: Data to save (dict or list)
             file_path: Path to save file
         """
-        with open(file_path, "w+", encoding='utf-8') as outfile:
+        with open(file_path, "w+", encoding="utf-8") as outfile:
             json.dump(data, outfile, ensure_ascii=False, indent=2)
 
     @staticmethod
@@ -85,16 +85,16 @@ class Utils:
                 - Currency data
                 - Unique items data
         """
-        with open("Data\\DivinationCard.json", "r", encoding='utf-8') as f:
+        with open("Data\\DivinationCard.json", "r", encoding="utf-8") as f:
             divination_data = json.load(f)
 
-        with open("Data\\Currency.json", "r", encoding='utf-8') as f:
+        with open("Data\\Currency.json", "r", encoding="utf-8") as f:
             currency_data = json.load(f)
 
         unique_items = {}
         for file in os.listdir("Uniquedata"):
             file_path = os.path.join("Uniquedata", file)
-            with open(file_path, "r", encoding='utf-8') as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 for item in data["lines"]:
                     unique_items[item["name"]] = item["chaosValue"]
@@ -102,7 +102,15 @@ class Utils:
         return divination_data, currency_data, unique_items
 
     @staticmethod
-    def process_card(name, chaos_value, stack_size, explicit_modifiers, currency, unique_items, divination_data):
+    def process_card(
+        name,
+        chaos_value,
+        stack_size,
+        explicit_modifiers,
+        currency,
+        unique_items,
+        divination_data,
+    ):
         total_cost = chaos_value * stack_size
         type_info = explicit_modifiers[0]["text"]
         match = re.match("<(.*)>{(.*)}", type_info)
@@ -117,7 +125,9 @@ class Utils:
                 try:
                     reward_value = currency.get(items[1], 0) * float(items[0])
                 except KeyError:
-                    print(f"KeyError: Item '{items[1]}' not found in currency data for card '{name}'")
+                    print(
+                        f"KeyError: Item '{items[1]}' not found in currency data for card '{name}'"
+                    )
                     return None
             elif match.group(1) == "uniqueitem":
                 reward_type = "Unique"
@@ -129,7 +139,9 @@ class Utils:
                 try:
                     reward_value = unique_items.get(item_reward, 0)
                 except KeyError:
-                    print(f"KeyError: Item '{item_reward}' not found in unique items data for card '{name}'")
+                    print(
+                        f"KeyError: Item '{item_reward}' not found in unique items data for card '{name}'"
+                    )
                     return None
             else:
                 reward_type = "Divination"
@@ -137,7 +149,9 @@ class Utils:
                 try:
                     reward_value = divination_data.get(item_reward, 0)
                 except KeyError:
-                    print(f"KeyError: Item '{item_reward}' not found in divination data for card '{name}'")
+                    print(
+                        f"KeyError: Item '{item_reward}' not found in divination data for card '{name}'"
+                    )
                     return None
             profit = round((reward_value - total_cost), 2)
             return {
@@ -148,7 +162,7 @@ class Utils:
                 "Stack": stack_size,
                 "Profitpercard": round(profit / stack_size, 2),
                 "Total": total_cost,
-                "Sellprice": reward_value
+                "Sellprice": reward_value,
             }
         return None
 
@@ -160,10 +174,7 @@ class Utils:
         return Utils.ITEM_NAME_MAPPINGS.get(reward_content, reward_content)
 
     def calculate_highscores(
-            self,
-            divination_data: Dict,
-            currency_data: Dict,
-            unique_items: Dict[str, float]
+        self, divination_data: Dict, currency_data: Dict, unique_items: Dict[str, float]
     ) -> Dict[str, Dict]:
         """Calculate profit highscores for divination cards.
 
@@ -201,7 +212,9 @@ class Utils:
             List of active league dictionaries
         """
         try:
-            req = Request(Utils.POE_API_LEAGUES_URL, headers={"User-Agent": Utils.USER_AGENT})
+            req = Request(
+                Utils.POE_API_LEAGUES_URL, headers={"User-Agent": Utils.USER_AGENT}
+            )
             with urlopen(req) as response:
                 leagues = json.loads(response.read().decode("utf-8"))
 
@@ -244,13 +257,20 @@ class Utils:
                 content = response.read().decode()
 
                 version_match = re.search(r'__version__ = "(.*?)"', content)
-                description_match = re.search(r'__version_description__ = "(.*?)"', content)
+                description_match = re.search(
+                    r'__version_description__ = """([\s\S]*?)"""',
+                    content,
+                )
 
                 if not version_match:
                     return None
 
                 version = version_match.group(1)
-                description = description_match.group(1) if description_match else "No description available."
+                description = (
+                    description_match.group(1)
+                    if description_match
+                    else "No description available."
+                )
                 return version, description
 
         except Exception as e:

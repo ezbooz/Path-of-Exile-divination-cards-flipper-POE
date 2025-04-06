@@ -3,16 +3,40 @@ from typing import Dict, List, Optional
 
 from PyQt6.QtCore import QPropertyAnimation, Qt, QTimer, QUrl
 from PyQt6.QtGui import QColor, QDesktopServices
-from PyQt6.QtWidgets import (QApplication, QComboBox, QHBoxLayout, QHeaderView,
-                             QLabel, QMainWindow, QMessageBox, QPushButton,
-                             QStyle, QStyledItemDelegate, QTableWidget,
-                             QTableWidgetItem, QVBoxLayout, QWidget)
+from PyQt6.QtWidgets import (
+    QApplication,
+    QComboBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+    QStyle,
+    QStyledItemDelegate,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
 
-from __version__ import __version__ as version, __version_description__
-from gui.styles import (COMBO_BOX, COPY_LABEL, FOOTER, FOOTER_LABEL, HEADER,
-                        HEADER_LABEL, MAIN_WINDOW, MESSAGE_BOX, START_BUTTON,
-                        STATUS_LABEL, TABLE_WIDGET, UPDATE_BUTTON,
-                        get_update_message)
+from __version__ import __version__ as version
+from __version__ import __version_description__
+from gui.styles import (
+    COMBO_BOX,
+    COPY_LABEL,
+    FOOTER,
+    FOOTER_LABEL,
+    HEADER,
+    HEADER_LABEL,
+    MAIN_WINDOW,
+    MESSAGE_BOX,
+    START_BUTTON,
+    STATUS_LABEL,
+    TABLE_WIDGET,
+    UPDATE_BUTTON,
+    get_update_message,
+)
 from poeNinja.ninjaAPI import PoeNinja
 from utils.utils import Utils
 
@@ -45,7 +69,9 @@ class MainWindow(QMainWindow):
 
     def _configure_main_window(self) -> None:
         """Configure main window properties."""
-        self.setWindowTitle(f"Path of Exile Card Flipper v{version} | github.com/ezbooz")
+        self.setWindowTitle(
+            f"Path of Exile Card Flipper v{version} | github.com/ezbooz"
+        )
         self.setFixedSize(1070, 700)
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
@@ -94,7 +120,9 @@ class MainWindow(QMainWindow):
         self.table_widget.setShowGrid(False)
         self.table_widget.verticalHeader().setVisible(False)
         self.table_widget.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
-        self.table_widget.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.table_widget.setSelectionBehavior(
+            QTableWidget.SelectionBehavior.SelectRows
+        )
         self.table_widget.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
 
     def _create_controls(self) -> None:
@@ -182,11 +210,7 @@ class MainWindow(QMainWindow):
         highscores = self.utils.calculate_highscores(
             divination_data, currency_data, unique_items
         )
-        return sorted(
-            highscores.values(),
-            key=lambda x: x["Profit"],
-            reverse=True
-        )
+        return sorted(highscores.values(), key=lambda x: x["Profit"], reverse=True)
 
     def _display_results(self, highscores_sorted: List[Dict]) -> None:
         """Display processed results in the table."""
@@ -204,10 +228,12 @@ class MainWindow(QMainWindow):
             with open("Data\\Currency.json", "r") as file:
                 data = json.load(file)
                 return next(
-                    (line["receive"]["value"]
-                     for line in data["lines"]
-                     if line["currencyTypeName"] == "Divine Orb"),
-                    None
+                    (
+                        line["receive"]["value"]
+                        for line in data["lines"]
+                        if line["currencyTypeName"] == "Divine Orb"
+                    ),
+                    None,
                 )
         except (FileNotFoundError, json.JSONDecodeError):
             return None
@@ -216,10 +242,18 @@ class MainWindow(QMainWindow):
         """Configure table structure and headers."""
         self.table_widget.setRowCount(len(data))
         self.table_widget.setColumnCount(8)
-        self.table_widget.setHorizontalHeaderLabels([
-            "#", "Name", "Type", "Total profit", "Profit per card",
-            "1 card price", "Total set price", "Reward price"
-        ])
+        self.table_widget.setHorizontalHeaderLabels(
+            [
+                "#",
+                "Name",
+                "Type",
+                "Total profit",
+                "Profit per card",
+                "1 card price",
+                "Total set price",
+                "Reward price",
+            ]
+        )
 
         header = self.table_widget.horizontalHeader()
         for col in range(self.table_widget.columnCount()):
@@ -255,9 +289,7 @@ class MainWindow(QMainWindow):
         self._create_table_item(row, 0, str(row + 1))
         self._create_table_item(row, 1, item["Name"], align_left=True)
         self._create_table_item(row, 2, item["Type"], align_left=True)
-        self._create_table_item(
-            row, 3, f"{int(item['Profit'])} c ({profit_divine} d)"
-        )
+        self._create_table_item(row, 3, f"{int(item['Profit'])} c ({profit_divine} d)")
         self._create_table_item(
             row, 4, f"{int(item['Profitpercard'])} c ({profit_per_card_divine} d)"
         )
@@ -267,8 +299,9 @@ class MainWindow(QMainWindow):
             row, 7, f"{int(item['Sellprice'])} c ({sellprice_divine} d)"
         )
 
-    def _create_table_item(self, row: int, col: int, text: str,
-                           align_left: bool = False) -> QTableWidgetItem:
+    def _create_table_item(
+        self, row: int, col: int, text: str, align_left: bool = False
+    ) -> QTableWidgetItem:
         """Create and configure a table widget item."""
         item = QTableWidgetItem(text)
         item.setBackground(QColor(0, 0, 0, 0))
@@ -340,9 +373,7 @@ class MainWindow(QMainWindow):
         self.fade_animation.setDuration(200)
         self.fade_animation.setStartValue(1)
         self.fade_animation.setEndValue(0)
-        self.fade_animation.finished.connect(
-            lambda: self.copy_label.setVisible(False)
-        )
+        self.fade_animation.finished.connect(lambda: self.copy_label.setVisible(False))
         self.fade_animation.start()
 
     def check_for_updates(self) -> None:
@@ -363,7 +394,9 @@ class MainWindow(QMainWindow):
             self.show_notification("You have the latest version")
             self.status_label.setText("You have the latest version")
 
-    def _show_update_message(self, remote_version: str, remote_description: str) -> None:
+    def _show_update_message(
+        self, remote_version: str, remote_description: str
+    ) -> None:
         """Show update available message box."""
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle("Update Available")
@@ -383,12 +416,14 @@ class MainWindow(QMainWindow):
             "query": {
                 "status": {"option": "online"},
                 "type": item_name,
-                "stats": [{"type": "and", "filters": []}]
+                "stats": [{"type": "and", "filters": []}],
             },
-            "sort": {"price": "asc"}
+            "sort": {"price": "asc"},
         }
 
         encoded_query = json.dumps(trade_query)
-        trade_url = f"https://www.pathofexile.com/trade/search/{league}?q={encoded_query}"
+        trade_url = (
+            f"https://www.pathofexile.com/trade/search/{league}?q={encoded_query}"
+        )
 
         QDesktopServices.openUrl(QUrl(trade_url))
