@@ -191,8 +191,9 @@ MESSAGE_BOX = """
     }
 """
 
+
 def get_update_message(remote_version, version):
-    return f'''
+    return f"""
         <p style='font-size:14px;'>A new version (<b>v{remote_version}</b>) is available!</p>
         <p style='font-size:13px;'>Current version: v{version}</p><br>
         <p style='font-size:14px;'>Download update: 
@@ -200,7 +201,8 @@ def get_update_message(remote_version, version):
         style='color:#4CAF50; text-decoration:none;'>
         <b>GitHub Repository</b></a></p>
         </div>
-    '''
+    """
+
 
 HEADER = """
             <div style='text-align: center;'>
@@ -215,4 +217,3 @@ HEADER = """
                 </p>
             </div>
         """
-

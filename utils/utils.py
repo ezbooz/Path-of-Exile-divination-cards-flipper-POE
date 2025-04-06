@@ -4,27 +4,6 @@ import re
 from datetime import datetime, timezone
 from urllib.request import Request, urlopen
 
-from PyQt6.QtCore import QPropertyAnimation, Qt, QTimer
-from PyQt6.QtGui import QColor
-from PyQt6.QtWidgets import (
-    QApplication,
-    QComboBox,
-    QHBoxLayout,
-    QHeaderView,
-    QLabel,
-    QMainWindow,
-    QPushButton,
-    QStyle,
-    QStyledItemDelegate,
-    QTableWidget,
-    QTableWidgetItem,
-    QVBoxLayout,
-    QWidget,
-)
-
-from __version__ import __version__
-from poeNinja.ninjaAPI import poeNinja
-
 
 class Utils:
     def __init__(self):
@@ -193,7 +172,9 @@ class Utils:
             url = "https://raw.githubusercontent.com/ezbooz/Path-of-Exile-divination-cards-flipper-POE/main/__version__.py"
             req = Request(url)
             web_byte = urlopen(req).read()
-            remote_version = re.search(r'__version__ = "(.*?)"', web_byte.decode()).group(1)
+            remote_version = re.search(
+                r'__version__ = "(.*?)"', web_byte.decode()
+            ).group(1)
             return remote_version
         except Exception:
             return None
