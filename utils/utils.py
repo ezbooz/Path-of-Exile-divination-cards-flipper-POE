@@ -102,135 +102,55 @@ class Utils:
         return divination_data, currency_data, unique_items
 
     @staticmethod
-    def process_card(
-            name: str,
-            chaos_value: float,
-            stack_size: int,
-            explicit_modifiers: List[Dict],
-            currency: Dict[str, float],
-            unique_items: Dict[str, float],
-            divination_data: Dict
-    ) -> Optional[Dict]:
-        """Process divination card data and calculate profit.
-
-        Args:
-            name: Card name
-            chaos_value: Value in chaos orbs
-            stack_size: Number of cards in a full set
-            explicit_modifiers: Card reward modifiers
-            currency: Currency data dictionary
-            unique_items: Unique items data dictionary
-            divination_data: Divination card data dictionary
-
-        Returns:
-            Dictionary with processed card data or None if processing fails
-        """
-        if not explicit_modifiers:
-            return None
-
-        type_info = explicit_modifiers[0]["text"]
-        match = re.match(r"<(.*?)>{(.*?)}", type_info)
-        if not match:
-            return None
-
-        reward_type, reward_content = match.groups()
+    def process_card(name, chaos_value, stack_size, explicit_modifiers, currency, unique_items, divination_data):
         total_cost = chaos_value * stack_size
-
-        # Handle special name cases
-        reward_content = Utils._handle_special_names(name, reward_content)
-
-        try:
-            if reward_type == "currencyitem":
-                return Utils._process_currency_reward(
-                    name, reward_content, currency, total_cost, chaos_value, stack_size
-                )
-            elif reward_type == "uniqueitem":
-                return Utils._process_unique_reward(
-                    name, reward_content, unique_items, total_cost, chaos_value, stack_size
-                )
+        type_info = explicit_modifiers[0]["text"]
+        match = re.match("<(.*)>{(.*)}", type_info)
+        if match:
+            if match.group(1) == "currencyitem":
+                reward_type = "Currency"
+                items = match.group(2).split("x ")
+                if len(items) == 1:
+                    items.insert(0, "1")
+                if items[1] == "Master Cartographer's Sextant":
+                    items[1] = "Awakened Sextant"
+                try:
+                    reward_value = currency.get(items[1], 0) * float(items[0])
+                except KeyError:
+                    print(f"KeyError: Item '{items[1]}' not found in currency data for card '{name}'")
+                    return None
+            elif match.group(1) == "uniqueitem":
+                reward_type = "Unique"
+                item_reward = match.group(2)
+                if item_reward == "Charan's Sword":
+                    item_reward = "Oni-Goroshi"
+                if name == "Azyran's Reward":
+                    item_reward = "The Anima Stone"
+                try:
+                    reward_value = unique_items.get(item_reward, 0)
+                except KeyError:
+                    print(f"KeyError: Item '{item_reward}' not found in unique items data for card '{name}'")
+                    return None
             else:
-                return Utils._process_divination_reward(
-                    name, reward_content, divination_data, total_cost, chaos_value, stack_size
-                )
-        except KeyError as e:
-            print(f"KeyError: Item '{e.args[0]}' not found in data for card '{name}'")
-            return None
-
-    @staticmethod
-    def _process_currency_reward(
-            name: str,
-            reward_content: str,
-            currency: Dict[str, float],
-            total_cost: float,
-            chaos_value: float,
-            stack_size: int
-    ) -> Dict:
-        """Process currency-type rewards."""
-        parts = reward_content.split("x ")
-        quantity = float(parts[0]) if len(parts) > 1 else 1.0
-        item_name = parts[1] if len(parts) > 1 else parts[0]
-
-        item_name = Utils.ITEM_NAME_MAPPINGS.get(item_name, item_name)
-        reward_value = currency[item_name] * quantity
-
-        return Utils._build_card_data(
-            name, "Currency", reward_value, total_cost, chaos_value, stack_size
-        )
-
-    @staticmethod
-    def _process_unique_reward(
-            name: str,
-            reward_content: str,
-            unique_items: Dict[str, float],
-            total_cost: float,
-            chaos_value: float,
-            stack_size: int
-    ) -> Dict:
-        """Process unique-item rewards."""
-        reward_content = Utils.ITEM_NAME_MAPPINGS.get(reward_content, reward_content)
-        reward_value = unique_items[reward_content]
-
-        return Utils._build_card_data(
-            name, "Unique", reward_value, total_cost, chaos_value, stack_size
-        )
-
-    @staticmethod
-    def _process_divination_reward(
-            name: str,
-            reward_content: str,
-            divination_data: Dict,
-            total_cost: float,
-            chaos_value: float,
-            stack_size: int
-    ) -> Dict:
-        """Process divination-card rewards."""
-        reward_value = divination_data[reward_content]
-
-        return Utils._build_card_data(
-            name, "Divination", reward_value, total_cost, chaos_value, stack_size
-        )
-
-    @staticmethod
-    def _build_card_data(
-            name: str,
-            reward_type: str,
-            reward_value: float,
-            total_cost: float,
-            chaos_value: float,
-            stack_size: int
-    ) -> Dict:
-        """Build the card data dictionary."""
-        profit = round((reward_value - total_cost), 2)
-        return {
-            "Name": name,
-            "Type": reward_type,
-            "Profit": profit,
-            "Cost": chaos_value,
-            "Stack": stack_size,
-            "Profitpercard": round(profit / stack_size, 2),
-            "Total": total_cost,
-            "Sellprice": reward_value,
-        }
+                reward_type = "Divination"
+                item_reward = match.group(2)
+                try:
+                    reward_value = divination_data.get(item_reward, 0)
+                except KeyError:
+                    print(f"KeyError: Item '{item_reward}' not found in divination data for card '{name}'")
+                    return None
+            profit = round((reward_value - total_cost), 2)
+            return {
+                "Name": name,
+                "Type": reward_type,
+                "Profit": profit,
+                "Cost": chaos_value,
+                "Stack": stack_size,
+                "Profitpercard": round(profit / stack_size, 2),
+                "Total": total_cost,
+                "Sellprice": reward_value
+            }
+        return None
 
     @staticmethod
     def _handle_special_names(card_name: str, reward_content: str) -> str:
