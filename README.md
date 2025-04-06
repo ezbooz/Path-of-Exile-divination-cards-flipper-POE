@@ -2,7 +2,10 @@
 
 This project provides a tool to assist with flipping divination cards in Path of Exile.
 
-![image](https://github.com/user-attachments/assets/04e332e8-7b2d-40a3-85bb-f03a5ea53fdb)
+![image](https://github.com/user-attachments/assets/43c149d0-6ded-42db-be00-98bfa0ad9e73)
+
+
+
 
 
 
