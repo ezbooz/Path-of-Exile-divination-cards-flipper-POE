@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'main.py'
+      - 'utils/**'
+      - 'poeNinja/**'
   workflow_dispatch:
 
 permissions:
