@@ -89,7 +89,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ needs.build.outputs.tag_name }}
-        release_name: "Version ${{ needs.build.outputs.version }}"
+        release_name: "PathOfExileFlipper v${{ needs.build.outputs.version }}"
         body: ${{ needs.build.outputs.release_body }}
 
     - name: Upload Release Asset
