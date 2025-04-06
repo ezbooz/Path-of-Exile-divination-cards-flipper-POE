@@ -2,7 +2,8 @@
 
 This project provides a tool to assist with flipping divination cards in Path of Exile.
 
-![poeFlipper](https://github.com/user-attachments/assets/c21de059-5dbc-49ce-a133-35c7bb634668)
+![image](https://github.com/user-attachments/assets/04e332e8-7b2d-40a3-85bb-f03a5ea53fdb)
+
 
 
 Install guide:
