@@ -3,21 +3,23 @@ import os
 import re
 from datetime import datetime, timezone
 from urllib.request import Request, urlopen
-from PyQt6.QtCore import QTimer, Qt, QPropertyAnimation
+
+from PyQt6.QtCore import QPropertyAnimation, Qt, QTimer
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (
-    QMainWindow,
-    QWidget,
-    QVBoxLayout,
-    QTableWidget,
-    QTableWidgetItem,
-    QPushButton,
     QApplication,
-    QLabel,
+    QComboBox,
     QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QMainWindow,
+    QPushButton,
     QStyle,
     QStyledItemDelegate,
-    QComboBox, QHeaderView,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
 )
 
 from __version__ import __version__
@@ -28,25 +30,30 @@ class Utils:
     def __init__(self):
         pass
 
-    def create_directories(self, *directories):
+    @staticmethod
+    def create_directories(*directories):
         for directory in directories:
             os.makedirs(directory, exist_ok=True)
 
-    def get_item_name(self, url):
+    @staticmethod
+    def get_item_name(url):
         temp = url.split("/")
         temp = temp[5].split("=")
         return temp[2]
 
-    def fetch_url_data(self, url):
+    @staticmethod
+    def fetch_url_data(url):
         req = Request(url, headers={"User-Agent": "Mozilla/5.0"})
         web_byte = urlopen(req).read()
         return json.loads(web_byte.decode())
 
-    def save_data_to_file(self, data, file_path):
+    @staticmethod
+    def save_data_to_file(data, file_path):
         with open(file_path, "w+") as outfile:
             json.dump(data, outfile)
 
-    def load_data(self):
+    @staticmethod
+    def load_data():
         with open("Data\\DivinationCard.json", "r") as read_file:
             divination_data = json.load(read_file)
 
@@ -63,8 +70,8 @@ class Utils:
 
         return divination_data, currency_data, unique_items
 
+    @staticmethod
     def process_card(
-        self,
         name,
         chaos_value,
         stack_size,
@@ -148,7 +155,8 @@ class Utils:
                 highscores[name] = card_data
         return highscores
 
-    def get_current_leagues(self):
+    @staticmethod
+    def get_current_leagues():
         url = "https://api.pathofexile.com/leagues?type=main"
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
@@ -191,7 +199,9 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.utils = Utils()
-        self.setWindowTitle(f"Path of Exile Card Flipper v{__version__} | github.com/ezbooz")
+        self.setWindowTitle(
+            f"Path of Exile Card Flipper v{__version__} | github.com/ezbooz"
+        )
         self.setFixedSize(1070, 700)
 
         self.central_widget = QWidget(self)
@@ -201,7 +211,8 @@ class MainWindow(QMainWindow):
         main_layout.setContentsMargins(15, 15, 15, 15)
         main_layout.setSpacing(15)
 
-        header = QLabel("""
+        header = QLabel(
+            """
             <div style='text-align: center;'>
                 <h1 style='margin: 0; color: #f0f0f0; font-weight: bold;'>
                     <a href='https://github.com/ezbooz/Path-of-Exile-divination-cards-flipper-POE'
@@ -213,7 +224,8 @@ class MainWindow(QMainWindow):
                     Click card name to copy | Select league and click Start
                 </p>
             </div>
-        """)
+        """
+        )
         header.setStyleSheet(
             """
             QLabel {
@@ -237,7 +249,8 @@ class MainWindow(QMainWindow):
 
         self.table_widget = QTableWidget(self)
         self.table_widget.setItemDelegate(NoFocusDelegate())
-        self.table_widget.setStyleSheet("""
+        self.table_widget.setStyleSheet(
+            """
             QTableWidget {
                 background-color: #252525;
                 border: 1px solid #333;
@@ -279,7 +292,8 @@ class MainWindow(QMainWindow):
                 height: 0;
                 background: none;
             }
-        """)
+        """
+        )
         main_layout.addWidget(self.table_widget, 1)
         self.table_widget.setShowGrid(False)
         self.table_widget.verticalHeader().setVisible(False)
@@ -318,7 +332,8 @@ class MainWindow(QMainWindow):
         self.button.setIcon(
             self.style().standardIcon(QStyle.StandardPixmap.SP_MediaPlay)
         )
-        self.button.setStyleSheet("""
+        self.button.setStyleSheet(
+            """
             QPushButton {
                 background-color: #4CAF50;
                 color: white;
@@ -343,10 +358,12 @@ class MainWindow(QMainWindow):
                 background-color: #333;
                 color: #666;
             }
-        """)
+        """
+        )
         button_layout.addWidget(self.button)
         self.status_label = QLabel("Select league")
-        self.status_label.setStyleSheet("""
+        self.status_label.setStyleSheet(
+            """
             QLabel {
                 color: #aaa;
                 font-size: 13px;
@@ -354,14 +371,16 @@ class MainWindow(QMainWindow):
                 background-color: #2d2d2d;
                 border-radius: 4px;
             }
-        """)
+        """
+        )
         button_layout.addWidget(self.status_label)
 
         button_layout.addStretch(1)
         main_layout.addLayout(button_layout)
 
         self.copy_label = QLabel("")
-        self.copy_label.setStyleSheet("""
+        self.copy_label.setStyleSheet(
+            """
             QLabel {
                 background-color: rgba(76, 175, 80, 200);
                 color: white;
@@ -371,7 +390,8 @@ class MainWindow(QMainWindow):
                 font-weight: bold;
                 opacity: 0;
             }
-        """)
+        """
+        )
         self.copy_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.copy_label.setVisible(False)
         main_layout.addWidget(self.copy_label)
@@ -454,7 +474,6 @@ class MainWindow(QMainWindow):
         if divine_orb_value is None:
             self.status_label.setText("Error: Divine Orb price not found!")
             return
-
         self.table_widget.setRowCount(len(highscores_sorted))
         self.table_widget.setColumnCount(8)
 
@@ -512,10 +531,18 @@ class MainWindow(QMainWindow):
         for col in range(1, self.table_widget.columnCount()):
             self.table_widget.resizeColumnToContents(col)
 
-
     def create_table_item(self, row, col, text, align_left=False):
         item = QTableWidgetItem(text)
         item.setBackground(QColor(0, 0, 0, 0))
+        if col in [3]:
+            try:
+                value = float(text.split()[0])
+                if value > 0:
+                    item.setForeground(QColor("#4CAF50"))
+                elif value < 0:
+                    item.setForeground(QColor("#F44336"))
+            except:
+                pass
         if not align_left:
             item.setTextAlignment(
                 Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
@@ -523,7 +550,7 @@ class MainWindow(QMainWindow):
         self.table_widget.setItem(row, col, item)
         return item
 
-    def copy_card_name(self, row, column):
+    def copy_card_name(self, row):
         item = self.table_widget.item(row, 1)
         if not item:
             return
