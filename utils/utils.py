@@ -14,7 +14,11 @@ from PyQt6.QtWidgets import (
     QTableWidgetItem,
     QPushButton,
     QApplication,
-    QLabel, QHBoxLayout, QStyle, QStyledItemDelegate, QComboBox,
+    QLabel,
+    QHBoxLayout,
+    QStyle,
+    QStyledItemDelegate,
+    QComboBox,
 )
 
 from poeNinja.ninjaAPI import poeNinja
@@ -147,24 +151,28 @@ class Utils:
     def get_current_leagues(self):
         url = "https://api.pathofexile.com/leagues?type=main"
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"}
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
+        }
         req = Request(url, headers=headers)
 
         with urlopen(req) as response:
-            data = json.loads(response.read().decode('utf-8'))
+            data = json.loads(response.read().decode("utf-8"))
 
         current_time = datetime.now(timezone.utc)
         active_leagues = []
 
         for league in data:
-            end_at = league.get('endAt')
+            end_at = league.get("endAt")
             if end_at is not None:
-                end_date = datetime.fromisoformat(end_at.replace('Z', '+00:00'))
+                end_date = datetime.fromisoformat(end_at.replace("Z", "+00:00"))
                 if end_date < current_time:
                     continue
 
-            name = league.get('name', '').lower()
-            if any(word in name for word in ['hardcore', 'ssf', 'ruthless', 'solo self-found']):
+            name = league.get("name", "").lower()
+            if any(
+                word in name
+                for word in ["hardcore", "ssf", "ruthless", "solo self-found"]
+            ):
                 continue
 
             active_leagues.append(league)
@@ -189,18 +197,20 @@ class MainWindow(QMainWindow):
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
 
-
         main_layout = QVBoxLayout(self.central_widget)
         main_layout.setContentsMargins(15, 15, 15, 15)
         main_layout.setSpacing(15)
 
-        header = QLabel("""
+        header = QLabel(
+            """
             <a href='https://github.com/ezbooz/Path-of-Exile-divination-cards-flipper-POE'
             style='text-decoration:none; color:#f0f0f0;'>
             Path of Exile Card Flipper
             </a>
-        """)
-        header.setStyleSheet("""
+        """
+        )
+        header.setStyleSheet(
+            """
             QLabel {
                 font-size: 24px;
                 font-weight: bold;
@@ -212,135 +222,139 @@ class MainWindow(QMainWindow):
                 color: #aa9c39;
                 text-shadow: 0 0 8px rgba(170, 156, 57, 0.3);
             }
-        """)
+        """
+        )
         header.setAlignment(Qt.AlignmentFlag.AlignCenter)
         header.setOpenExternalLinks(True)
         header.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         header.setCursor(Qt.CursorShape.PointingHandCursor)
         main_layout.addWidget(header)
 
-
         self.table_widget = QTableWidget(self)
         self.table_widget.setItemDelegate(NoFocusDelegate())
-        self.table_widget.setStyleSheet("""
+        self.table_widget.setStyleSheet(
+            """
             QTableWidget {
-                background-color: #2a2a2a;
-                border: 1px solid #444;
-                border-radius: 5px;
+                background-color: #252525;
+                border: 1px solid #333;
+                border-radius: 6px;
                 color: #e0e0e0;
-                gridline-color: #444;
-                font-size: 12px;
-                alternate-background-color: #2a2a2a;
+                gridline-color: #333;
+                font-size: 13px;
+                alternate-background-color: #252525;
             }
-           QTableWidget::item {
-               padding: 5px;
-               background: transparent;
-               border: none;
-           }
+            QTableWidget::item {
+                padding: 6px;
+            }
             QTableWidget::item:selected {
                 background-color: #3a3a3a;
                 color: white;
-                border: none; 
-                outline: none;
-            }
-            QTableWidget::item:focus {
-            outline: none;
             }
             QHeaderView::section {
-                background-color: #333;
+                background-color: #2d2d2d;
                 color: #f0f0f0;
-                padding: 5px;
+                padding: 8px;
                 border: none;
                 font-weight: bold;
+                font-size: 13px;
             }
             QScrollBar:vertical {
-                background: #2a2a2a;
-                width: 10px;
+                background: #252525;
+                width: 12px;
+                margin: 0;
             }
             QScrollBar::handle:vertical {
                 background: #444;
                 min-height: 20px;
-                border-radius: 5px;
+                border-radius: 6px;
             }
             QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0;
                 background: none;
             }
-        """)
+        """
+        )
         main_layout.addWidget(self.table_widget, 1)
 
         button_layout = QHBoxLayout()
         button_layout.setSpacing(10)
         self.league_selector = QComboBox()
-        self.league_selector.addItems([
-            league["name"] for league in self.utils.get_current_leagues()
-        ])
-        self.league_selector.setStyleSheet("""
+        self.league_selector.addItems(
+            [league["name"] for league in self.utils.get_current_leagues()]
+        )
+        self.league_selector.setStyleSheet(
+            """
             QComboBox {
-                background-color: #333;
+                background-color: #2d2d2d;
                 color: #f0f0f0;
                 border: 1px solid #444;
-                border-radius: 4px;
-                padding: 5px;
+                border-radius: 5px;
+                padding: 8px 15px;
                 font-size: 14px;
+                min-width: 100px;
             }
             QComboBox:hover {
                 border: 1px solid #4CAF50;
             }
-
             QComboBox QAbstractItemView {
-                background-color: #333;
+                background-color: #2d2d2d;
                 color: #f0f0f0;
                 border: 1px solid #444;
+                selection-background-color: #4CAF50;
+                padding: 8px;
             }
-            QComboBox::item {
-                padding: 10px;
-            }
-            QComboBox::item:selected {
-                background-color: #4CAF50;
-            }
-        """)
+        """
+        )
         button_layout.addWidget(self.league_selector)
 
-
         self.button = QPushButton(" Start ", self)
-        self.button.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_MediaPlay))
-        self.button.setStyleSheet("""
+        self.button.setIcon(
+            self.style().standardIcon(QStyle.StandardPixmap.SP_MediaPlay)
+        )
+        self.button.setStyleSheet(
+            """
             QPushButton {
                 background-color: #4CAF50;
                 color: white;
                 border: none;
-                padding: 8px 16px;
+                padding: 10px 20px;
                 font-size: 14px;
                 font-weight: bold;
-                border-radius: 4px;
-                min-width: 100px;
+                border-radius: 5px;
+                min-width: 120px;
+                transition: all 0.3s;
             }
             QPushButton:hover {
                 background-color: #45a049;
+                transform: translateY(-1px);
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             }
             QPushButton:pressed {
                 background-color: #3d8b40;
+                transform: translateY(1px);
             }
-        """)
+        """
+        )
         button_layout.addWidget(self.button)
 
-
-        self.status_label = QLabel("Choose your league...")
-        self.status_label.setStyleSheet("""
+        self.status_label = QLabel("Select league")
+        self.status_label.setStyleSheet(
+            """
             QLabel {
                 color: #aaa;
                 font-size: 12px;
                 padding: 5px;
             }
-        """)
+        """
+        )
         button_layout.addWidget(self.status_label)
 
         button_layout.addStretch(1)
         main_layout.addLayout(button_layout)
 
-
         self.copy_label = QLabel("")
-        self.copy_label.setStyleSheet("""
+        self.copy_label.setStyleSheet(
+            """
             QLabel {
                 background-color: rgba(76, 175, 80, 180);
                 color: white;
@@ -349,14 +363,18 @@ class MainWindow(QMainWindow):
                 font-size: 12px;
                 opacity: 0;
             }
-        """)
+        """
+        )
         self.copy_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.copy_label.setVisible(False)
         main_layout.addWidget(self.copy_label)
 
         footer = QLabel(
-            "<a href='https://github.com/ezbooz' style='text-decoration:none; color:#666;'>github.com/ezbooz</a>")
-        footer.setStyleSheet("""
+            "<a href='https://github.com/ezbooz' style='text-decoration:none; color:#666;'>github.com/ezbooz</a>"
+        )
+
+        footer.setStyleSheet(
+            """
             QLabel {
                 font-size: 11px;
                 padding-top: 10px;
@@ -365,30 +383,34 @@ class MainWindow(QMainWindow):
             QLabel:hover {
                 color: #999;
             }
-        """)
+        """
+        )
         footer.setAlignment(Qt.AlignmentFlag.AlignRight)
         footer.setOpenExternalLinks(True)
         footer.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         main_layout.addWidget(footer)
 
-
         self.table_widget.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
-        self.table_widget.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.table_widget.setSelectionBehavior(
+            QTableWidget.SelectionBehavior.SelectRows
+        )
         self.table_widget.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.table_widget.cellClicked.connect(self.copy_card_name)
 
-
         self.button.clicked.connect(self.process_data)
 
-
-        self.setStyleSheet("""
+        self.setStyleSheet(
+            """
             QMainWindow {
-                background-color: #1e1e1e;
+                background-color: #1a1a1a;
             }
             QWidget {
-                background-color: #1e1e1e;
+                background-color: #1a1a1a;
+                color: #e0e0e0;
+                font-family: 'Segoe UI', Arial, sans-serif;
             }
-        """)
+        """
+        )
 
     def process_data(self):
         self.status_label.setText("Processing data...")
@@ -414,7 +436,7 @@ class MainWindow(QMainWindow):
             self.status_label.setText(f"Error: {str(e)}")
 
     def display_results(self, highscores_sorted):
-        with open('Data\\Currency.json', 'r') as file:
+        with open("Data\\Currency.json", "r") as file:
             data = json.load(file)
             divine_orb_value = None
             for line in data["lines"]:
@@ -440,29 +462,39 @@ class MainWindow(QMainWindow):
         ]
         self.table_widget.setHorizontalHeaderLabels(headers)
 
-
         self.table_widget.setColumnWidth(0, 200)
         self.table_widget.setColumnWidth(1, 100)
         for col in range(2, 7):
             self.table_widget.setColumnWidth(col, 120)
 
-
         for row, item in enumerate(highscores_sorted):
             profit_in_divine = round(item["Profit"] / divine_orb_value, 2)
-            profit_per_card_in_divine = round(item["Profitpercard"] / divine_orb_value, 2)
+            profit_per_card_in_divine = round(
+                item["Profitpercard"] / divine_orb_value, 2
+            )
             total_in_divine = round(item["Total"] / divine_orb_value, 2)
             sellprice_in_divine = round(item["Sellprice"] / divine_orb_value, 2)
             cost_in_divine = round(item["Cost"] / divine_orb_value, 2)
 
-
             self.create_table_item(row, 0, item["Name"], align_left=True)
             self.create_table_item(row, 1, item["Type"], align_left=True)
-            self.create_table_item(row, 2, f"{int(item['Profit'])} c ({profit_in_divine} d)")
-            self.create_table_item(row, 3, f"{int(item['Profitpercard'])} c ({profit_per_card_in_divine} d)")
-            self.create_table_item(row, 4, f"{int(item['Cost'])} c ({cost_in_divine} d)")
-            self.create_table_item(row, 5, f"{int(item['Total'])} c ({total_in_divine} d)")
-            self.create_table_item(row, 6, f"{int(item['Sellprice'])} c ({sellprice_in_divine} d)")
-
+            self.create_table_item(
+                row, 2, f"{int(item['Profit'])} c ({profit_in_divine} d)"
+            )
+            self.create_table_item(
+                row,
+                3,
+                f"{int(item['Profitpercard'])} c ({profit_per_card_in_divine} d)",
+            )
+            self.create_table_item(
+                row, 4, f"{int(item['Cost'])} c ({cost_in_divine} d)"
+            )
+            self.create_table_item(
+                row, 5, f"{int(item['Total'])} c ({total_in_divine} d)"
+            )
+            self.create_table_item(
+                row, 6, f"{int(item['Sellprice'])} c ({sellprice_in_divine} d)"
+            )
 
         self.highlight_top_rows()
 
@@ -470,7 +502,9 @@ class MainWindow(QMainWindow):
         item = QTableWidgetItem(text)
         item.setBackground(QColor(0, 0, 0, 0))
         if not align_left:
-            item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+            item.setTextAlignment(
+                Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+            )
         self.table_widget.setItem(row, col, item)
         return item
 
@@ -486,30 +520,26 @@ class MainWindow(QMainWindow):
         if not item:
             return
 
-
         QApplication.clipboard().setText(item.text())
 
-
-        if hasattr(self, '_copy_timer'):
+        if hasattr(self, "_copy_timer"):
             self._copy_timer.stop()
-        if hasattr(self, 'fade_animation'):
+        if hasattr(self, "fade_animation"):
             self.fade_animation.stop()
-
 
         rect = self.table_widget.visualItemRect(item)
         global_pos = self.table_widget.mapToGlobal(rect.topLeft())
         local_pos = self.central_widget.mapFromGlobal(global_pos)
-
 
         label_width = 80
         label_height = rect.height()
         label_x = local_pos.x() + rect.width() + 10
         label_y = local_pos.y()
 
-
         self.copy_label.setGeometry(label_x, label_y, label_width, label_height)
         self.copy_label.setText("Copied!")
-        self.copy_label.setStyleSheet("""
+        self.copy_label.setStyleSheet(
+            """
             QLabel {
                 background-color: rgba(76, 175, 80, 180);
                 color: white;
@@ -518,8 +548,8 @@ class MainWindow(QMainWindow):
                 font-size: 12px;
                 opacity: 0;
             }
-        """)
-
+        """
+        )
 
         self.fade_animation = QPropertyAnimation(self.copy_label, b"opacity")
         self.fade_animation.setDuration(200)
@@ -529,14 +559,13 @@ class MainWindow(QMainWindow):
 
         self.copy_label.setVisible(True)
 
-
         self._copy_timer = QTimer()
         self._copy_timer.setSingleShot(True)
         self._copy_timer.timeout.connect(self._hide_copy_label)
         self._copy_timer.start(2000)
 
     def _hide_copy_label(self):
-        if hasattr(self, 'fade_animation'):
+        if hasattr(self, "fade_animation"):
             self.fade_animation.stop()
 
         self.fade_animation = QPropertyAnimation(self.copy_label, b"opacity")

@@ -1,6 +1,7 @@
 class poeNinja:
     def __init__(self):
         from utils.utils import Utils
+
         self.utils = Utils()
 
     def get_data(self, league_name):
