@@ -1,39 +1,21 @@
-## Path of Exile Divination Cards Flipper (POE)
+![poeFlipper](https://github.com/user-attachments/assets/abbf33e6-8b6f-4605-b49f-87620e82e306)## Path of Exile Divination Cards Flipper (POE)
 
 This project provides a tool to assist with flipping divination cards in Path of Exile.
 
-
-## Installation
-
-**Prerequisites:**
-
-* Python 3 (Download from https://www.python.org/downloads/)
-* GIT (Download from https://git-scm.com/)
-
-**Steps:**
-1. **Clone the repository:**
-
-```bash
-git clone https://github.com/ezbooz/Path-of-Exile-divination-cards-flipper-POE
-```
-
-2. Navigate to the project directory:
-```
-cd Path-of-Exile-divination-cards-flipper-POE
-```
-
-3. Run the script:
-```bash
-python main.py
-```
-
- No external libraries, no POESESSID required. 
+![poeFlipper](https://github.com/user-attachments/assets/c21de059-5dbc-49ce-a133-35c7bb634668)
 
 
-![image](https://github.com/ezbooz/Path-of-Exile-divination-cards-flipper/assets/55065112/0be2a7ef-ace6-423d-9690-bfcfe1ec17b2)
+Install guide:
+1. Install Python 3.8 or higher.
+2. Install the required libraries using pip: `pip install -r requirements.txt`
+3. Run the script: `python main.py`
+4. Ensure that Discord is running.
+
+**For convenience, a pre-compiled .exe is available in the releases section.  
+Download the latest release here:**  
+👉 https://github.com/ezbooz/Path-of-Exile-divination-cards-flipper-POE/releases
 
 
-Online version: https://replit.com/@ezbooz/Path-of-Exile-or-DIVination-flip
 
 ## Additional Information
 **Acknowledgments:**
