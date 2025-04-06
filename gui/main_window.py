@@ -1,14 +1,14 @@
 import json
 from typing import Dict, List, Optional
 
-from PyQt6.QtCore import QPropertyAnimation, Qt, QTimer
-from PyQt6.QtGui import QColor
+from PyQt6.QtCore import QPropertyAnimation, Qt, QTimer, QUrl
+from PyQt6.QtGui import QColor, QDesktopServices
 from PyQt6.QtWidgets import (QApplication, QComboBox, QHBoxLayout, QHeaderView,
                              QLabel, QMainWindow, QMessageBox, QPushButton,
                              QStyle, QStyledItemDelegate, QTableWidget,
                              QTableWidgetItem, QVBoxLayout, QWidget)
 
-from __version__ import __version__ as version
+from __version__ import __version__ as version, __version_description__
 from gui.styles import (COMBO_BOX, COPY_LABEL, FOOTER, FOOTER_LABEL, HEADER,
                         HEADER_LABEL, MAIN_WINDOW, MESSAGE_BOX, START_BUTTON,
                         STATUS_LABEL, TABLE_WIDGET, UPDATE_BUTTON,
@@ -73,6 +73,7 @@ class MainWindow(QMainWindow):
         self.table_widget.cellClicked.connect(self.copy_card_name)
         self.start_button.clicked.connect(self.process_data)
         self.update_button.clicked.connect(self.check_for_updates)
+        self.table_widget.cellDoubleClicked.connect(self.generate_trade_link)
 
     def _setup_animation_timers(self) -> None:
         """Initialize animation timers."""
@@ -346,29 +347,48 @@ class MainWindow(QMainWindow):
 
     def check_for_updates(self) -> None:
         """Check for application updates."""
-        remote_version = self.utils.check_for_updates()
+        result = self.utils.check_for_updates()
 
-        if not remote_version:
+        if not result:
             self.status_label.setText("Failed to check for updates")
             return
+
+        remote_version, remote_description = result
 
         if remote_version != version:
             self.status_label.setText(f"Update available: v{remote_version}")
             self.show_notification("Update available!", 5)
-            self._show_update_message(remote_version)
+            self._show_update_message(remote_version, remote_description)
         else:
             self.show_notification("You have the latest version")
             self.status_label.setText("You have the latest version")
 
-    def _show_update_message(self, remote_version: str) -> None:
+    def _show_update_message(self, remote_version: str, remote_description: str) -> None:
         """Show update available message box."""
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle("Update Available")
         msg_box.setTextFormat(Qt.TextFormat.RichText)
-        msg_box.setText(get_update_message(remote_version, version))
+        msg_box.setText(get_update_message(remote_version, version, remote_description))
         msg_box.setStyleSheet(MESSAGE_BOX)
         msg_box.setStandardButtons(QMessageBox.StandardButton.Ok)
-        msg_box.setTextInteractionFlags(
-            Qt.TextInteractionFlag.TextBrowserInteraction
-        )
+        msg_box.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         msg_box.exec()
+
+    def generate_trade_link(self, row: int, column: int) -> None:
+        """Generate trade link for the selected item and copy to clipboard."""
+        item_name = self.table_widget.item(row, 1).text()
+        league = self.league_selector.currentText()
+
+        trade_query = {
+            "query": {
+                "status": {"option": "online"},
+                "type": item_name,
+                "stats": [{"type": "and", "filters": []}]
+            },
+            "sort": {"price": "asc"}
+        }
+
+        encoded_query = json.dumps(trade_query)
+        trade_url = f"https://www.pathofexile.com/trade/search/{league}?q={encoded_query}"
+
+        QDesktopServices.openUrl(QUrl(trade_url))

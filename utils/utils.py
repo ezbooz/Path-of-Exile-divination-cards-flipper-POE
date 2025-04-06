@@ -312,18 +312,27 @@ class Utils:
         return not any(term in name for term in excluded_terms)
 
     @staticmethod
-    def check_for_updates() -> Optional[str]:
+    def check_for_updates() -> Optional[tuple[str, str]]:
         """Check for available updates on GitHub.
 
         Returns:
-            Remote version string if available, None otherwise
+            Tuple (version, description) if available, otherwise None
         """
         try:
             req = Request(Utils.GITHUB_VERSION_URL)
             with urlopen(req) as response:
                 content = response.read().decode()
-                match = re.search(r'__version__ = "(.*?)"', content)
-                return match.group(1) if match else None
+
+                version_match = re.search(r'__version__ = "(.*?)"', content)
+                description_match = re.search(r'__version_description__ = "(.*?)"', content)
+
+                if not version_match:
+                    return None
+
+                version = version_match.group(1)
+                description = description_match.group(1) if description_match else "No description available."
+                return version, description
+
         except Exception as e:
             print(f"Error checking for updates: {e}")
             return None
