@@ -1,6 +1,7 @@
 import json
 import os
 import re
+from datetime import datetime, timezone
 from urllib.request import Request, urlopen
 
 from PyQt6.QtCore import QTimer, Qt, QPropertyAnimation
@@ -13,9 +14,10 @@ from PyQt6.QtWidgets import (
     QTableWidgetItem,
     QPushButton,
     QApplication,
-    QMessageBox,
-    QLabel, QHBoxLayout, QStyle,
+    QLabel, QHBoxLayout, QStyle, QStyledItemDelegate, QComboBox,
 )
+
+from poeNinja.ninjaAPI import poeNinja
 
 
 class Utils:
@@ -142,11 +144,45 @@ class Utils:
                 highscores[name] = card_data
         return highscores
 
+    def get_current_leagues(self):
+        url = "https://api.pathofexile.com/leagues?type=main"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"}
+        req = Request(url, headers=headers)
+
+        with urlopen(req) as response:
+            data = json.loads(response.read().decode('utf-8'))
+
+        current_time = datetime.now(timezone.utc)
+        active_leagues = []
+
+        for league in data:
+            end_at = league.get('endAt')
+            if end_at is not None:
+                end_date = datetime.fromisoformat(end_at.replace('Z', '+00:00'))
+                if end_date < current_time:
+                    continue
+
+            name = league.get('name', '').lower()
+            if any(word in name for word in ['hardcore', 'ssf', 'ruthless', 'solo self-found']):
+                continue
+
+            active_leagues.append(league)
+
+        return active_leagues
+
+
+class NoFocusDelegate(QStyledItemDelegate):
+    def paint(self, painter, option, index):
+        if option.state & QStyle.StateFlag.State_HasFocus:
+            option.state &= ~QStyle.StateFlag.State_HasFocus
+        super().paint(painter, option, index)
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-
+        self.utils = Utils()
         self.setWindowTitle("Path of Exile Card Flipper | github.com/ezbooz")
         self.setFixedSize(1000, 700)
 
@@ -186,6 +222,7 @@ class MainWindow(QMainWindow):
 
 
         self.table_widget = QTableWidget(self)
+        self.table_widget.setItemDelegate(NoFocusDelegate())
         self.table_widget.setStyleSheet("""
             QTableWidget {
                 background-color: #2a2a2a;
@@ -201,6 +238,10 @@ class MainWindow(QMainWindow):
             QTableWidget::item:selected {
                 background-color: #3a3a3a;
                 color: white;
+                border: none; 
+            }
+            QTableWidget::item:focus {
+            outline: none;
             }
             QHeaderView::section {
                 background-color: #333;
@@ -224,9 +265,45 @@ class MainWindow(QMainWindow):
         """)
         main_layout.addWidget(self.table_widget, 1)
 
-
         button_layout = QHBoxLayout()
         button_layout.setSpacing(10)
+
+        self.league_selector = QComboBox()
+        self.league_selector.addItems([
+            league["name"] for league in self.utils.get_current_leagues()
+        ])
+        self.league_selector.setStyleSheet("""
+            QComboBox {
+                background-color: #333;
+                color: #f0f0f0;
+                border: 1px solid #444;
+                border-radius: 4px;
+                padding: 5px;
+                font-size: 14px;
+            }
+            QComboBox:hover {
+                border: 1px solid #4CAF50;
+            }
+            QComboBox::drop-down {
+                border: none;
+                background: #444;
+                width: 25px;
+                subcontrol-position: right;
+                subcontrol-origin: padding;
+            }
+            QComboBox QAbstractItemView {
+                background-color: #333;
+                color: #f0f0f0;
+                border: 1px solid #444;
+            }
+            QComboBox::item {
+                padding: 10px;
+            }
+            QComboBox::item:selected {
+                background-color: #4CAF50;
+            }
+        """)
+        button_layout.addWidget(self.league_selector)
 
 
         self.button = QPushButton(" Start ", self)
@@ -320,12 +397,14 @@ class MainWindow(QMainWindow):
     def process_data(self):
         self.status_label.setText("Processing data...")
         QApplication.processEvents()
+        selected_league = self.league_selector.currentText()
 
         try:
-            utils = Utils()
-            divination_data, currency_data, unique_items = utils.load_data()
+            poe_ninja = poeNinja()
+            poe_ninja.get_data(selected_league)
+            divination_data, currency_data, unique_items = self.utils.load_data()
 
-            highscores = utils.calculate_highscores(
+            highscores = self.utils.calculate_highscores(
                 divination_data, currency_data, unique_items
             )
             highscores_sorted = sorted(
