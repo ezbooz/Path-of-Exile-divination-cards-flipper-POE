@@ -3,7 +3,6 @@ import os
 import re
 from datetime import datetime, timezone
 from urllib.request import Request, urlopen
-
 from PyQt6.QtCore import QTimer, Qt, QPropertyAnimation
 from PyQt6.QtGui import QColor
 from PyQt6.QtWidgets import (
@@ -18,9 +17,10 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
     QStyle,
     QStyledItemDelegate,
-    QComboBox,
+    QComboBox, QHeaderView,
 )
 
+from __version__ import __version__
 from poeNinja.ninjaAPI import poeNinja
 
 
@@ -191,8 +191,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.utils = Utils()
-        self.setWindowTitle("Path of Exile Card Flipper | github.com/ezbooz")
-        self.setFixedSize(1000, 700)
+        self.setWindowTitle(f"Path of Exile Card Flipper v{__version__} | github.com/ezbooz")
+        self.setFixedSize(1070, 700)
 
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
@@ -201,14 +201,19 @@ class MainWindow(QMainWindow):
         main_layout.setContentsMargins(15, 15, 15, 15)
         main_layout.setSpacing(15)
 
-        header = QLabel(
-            """
-            <a href='https://github.com/ezbooz/Path-of-Exile-divination-cards-flipper-POE'
-            style='text-decoration:none; color:#f0f0f0;'>
-            Path of Exile Card Flipper
-            </a>
-        """
-        )
+        header = QLabel("""
+            <div style='text-align: center;'>
+                <h1 style='margin: 0; color: #f0f0f0; font-weight: bold;'>
+                    <a href='https://github.com/ezbooz/Path-of-Exile-divination-cards-flipper-POE'
+                    style='text-decoration: none; color: #f0f0f0;'>
+                    Path of Exile Card Flipper
+                    </a>
+                </h1>
+                <p style='margin: 5px 0 0; color: #aaa; font-size: 12px;'>
+                    Click card name to copy | Select league and click Start
+                </p>
+            </div>
+        """)
         header.setStyleSheet(
             """
             QLabel {
@@ -232,8 +237,7 @@ class MainWindow(QMainWindow):
 
         self.table_widget = QTableWidget(self)
         self.table_widget.setItemDelegate(NoFocusDelegate())
-        self.table_widget.setStyleSheet(
-            """
+        self.table_widget.setStyleSheet("""
             QTableWidget {
                 background-color: #252525;
                 border: 1px solid #333;
@@ -244,19 +248,22 @@ class MainWindow(QMainWindow):
                 alternate-background-color: #252525;
             }
             QTableWidget::item {
-                padding: 6px;
+                padding: 8px;
+                border-bottom: 1px solid #333;
             }
             QTableWidget::item:selected {
                 background-color: #3a3a3a;
                 color: white;
+                border: none;
             }
             QHeaderView::section {
                 background-color: #2d2d2d;
                 color: #f0f0f0;
-                padding: 8px;
+                padding: 10px;
                 border: none;
                 font-weight: bold;
                 font-size: 13px;
+                border-bottom: 2px solid #4CAF50;
             }
             QScrollBar:vertical {
                 background: #252525;
@@ -264,7 +271,7 @@ class MainWindow(QMainWindow):
                 margin: 0;
             }
             QScrollBar::handle:vertical {
-                background: #444;
+                background: #4CAF50;
                 min-height: 20px;
                 border-radius: 6px;
             }
@@ -272,10 +279,10 @@ class MainWindow(QMainWindow):
                 height: 0;
                 background: none;
             }
-        """
-        )
+        """)
         main_layout.addWidget(self.table_widget, 1)
-
+        self.table_widget.setShowGrid(False)
+        self.table_widget.verticalHeader().setVisible(False)
         button_layout = QHBoxLayout()
         button_layout.setSpacing(10)
         self.league_selector = QComboBox()
@@ -311,13 +318,12 @@ class MainWindow(QMainWindow):
         self.button.setIcon(
             self.style().standardIcon(QStyle.StandardPixmap.SP_MediaPlay)
         )
-        self.button.setStyleSheet(
-            """
+        self.button.setStyleSheet("""
             QPushButton {
                 background-color: #4CAF50;
                 color: white;
                 border: none;
-                padding: 10px 20px;
+                padding: 12px 24px;
                 font-size: 14px;
                 font-weight: bold;
                 border-radius: 5px;
@@ -327,44 +333,45 @@ class MainWindow(QMainWindow):
             QPushButton:hover {
                 background-color: #45a049;
                 transform: translateY(-1px);
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
             }
             QPushButton:pressed {
                 background-color: #3d8b40;
                 transform: translateY(1px);
             }
-        """
-        )
+            QPushButton:disabled {
+                background-color: #333;
+                color: #666;
+            }
+        """)
         button_layout.addWidget(self.button)
-
         self.status_label = QLabel("Select league")
-        self.status_label.setStyleSheet(
-            """
+        self.status_label.setStyleSheet("""
             QLabel {
                 color: #aaa;
-                font-size: 12px;
-                padding: 5px;
+                font-size: 13px;
+                padding: 8px 12px;
+                background-color: #2d2d2d;
+                border-radius: 4px;
             }
-        """
-        )
+        """)
         button_layout.addWidget(self.status_label)
 
         button_layout.addStretch(1)
         main_layout.addLayout(button_layout)
 
         self.copy_label = QLabel("")
-        self.copy_label.setStyleSheet(
-            """
+        self.copy_label.setStyleSheet("""
             QLabel {
-                background-color: rgba(76, 175, 80, 180);
+                background-color: rgba(76, 175, 80, 200);
                 color: white;
-                padding: 3px 8px;
-                border-radius: 3px;
-                font-size: 12px;
+                padding: 5px 12px;
+                border-radius: 4px;
+                font-size: 13px;
+                font-weight: bold;
                 opacity: 0;
             }
-        """
-        )
+        """)
         self.copy_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.copy_label.setVisible(False)
         main_layout.addWidget(self.copy_label)
@@ -449,9 +456,10 @@ class MainWindow(QMainWindow):
             return
 
         self.table_widget.setRowCount(len(highscores_sorted))
-        self.table_widget.setColumnCount(7)
+        self.table_widget.setColumnCount(8)
 
         headers = [
+            "#",
             "Name",
             "Type",
             "Total profit",
@@ -461,13 +469,18 @@ class MainWindow(QMainWindow):
             "Reward price",
         ]
         self.table_widget.setHorizontalHeaderLabels(headers)
+        header = self.table_widget.horizontalHeader()
+        for col in range(self.table_widget.columnCount()):
+            header.setSectionResizeMode(col, QHeaderView.ResizeMode.Fixed)
 
-        self.table_widget.setColumnWidth(0, 200)
-        self.table_widget.setColumnWidth(1, 100)
-        for col in range(2, 7):
-            self.table_widget.setColumnWidth(col, 120)
+        self.table_widget.setColumnWidth(0, 40)
+
+        for row in range(self.table_widget.rowCount()):
+            self.table_widget.setRowHeight(row, 20)
 
         for row, item in enumerate(highscores_sorted):
+            self.create_table_item(row, 0, str(row + 1))
+
             profit_in_divine = round(item["Profit"] / divine_orb_value, 2)
             profit_per_card_in_divine = round(
                 item["Profitpercard"] / divine_orb_value, 2
@@ -476,27 +489,29 @@ class MainWindow(QMainWindow):
             sellprice_in_divine = round(item["Sellprice"] / divine_orb_value, 2)
             cost_in_divine = round(item["Cost"] / divine_orb_value, 2)
 
-            self.create_table_item(row, 0, item["Name"], align_left=True)
-            self.create_table_item(row, 1, item["Type"], align_left=True)
+            self.create_table_item(row, 1, item["Name"], align_left=True)
+            self.create_table_item(row, 2, item["Type"], align_left=True)
             self.create_table_item(
-                row, 2, f"{int(item['Profit'])} c ({profit_in_divine} d)"
+                row, 3, f"{int(item['Profit'])} c ({profit_in_divine} d)"
             )
             self.create_table_item(
                 row,
-                3,
+                4,
                 f"{int(item['Profitpercard'])} c ({profit_per_card_in_divine} d)",
             )
             self.create_table_item(
-                row, 4, f"{int(item['Cost'])} c ({cost_in_divine} d)"
+                row, 5, f"{int(item['Cost'])} c ({cost_in_divine} d)"
             )
             self.create_table_item(
-                row, 5, f"{int(item['Total'])} c ({total_in_divine} d)"
+                row, 6, f"{int(item['Total'])} c ({total_in_divine} d)"
             )
             self.create_table_item(
-                row, 6, f"{int(item['Sellprice'])} c ({sellprice_in_divine} d)"
+                row, 7, f"{int(item['Sellprice'])} c ({sellprice_in_divine} d)"
             )
 
-        self.highlight_top_rows()
+        for col in range(1, self.table_widget.columnCount()):
+            self.table_widget.resizeColumnToContents(col)
+
 
     def create_table_item(self, row, col, text, align_left=False):
         item = QTableWidgetItem(text)
@@ -508,15 +523,8 @@ class MainWindow(QMainWindow):
         self.table_widget.setItem(row, col, item)
         return item
 
-    def highlight_top_rows(self):
-        for row in range(min(3, self.table_widget.rowCount())):
-            for col in range(self.table_widget.columnCount()):
-                item = self.table_widget.item(row, col)
-                if item:
-                    item.setBackground(QColor(76, 175, 80, 50))
-
     def copy_card_name(self, row, column):
-        item = self.table_widget.item(row, 0)
+        item = self.table_widget.item(row, 1)
         if not item:
             return
 
