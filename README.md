@@ -1,33 +1,34 @@
-## Path of Exile Divination Cards Flipper (POE)
+# 🃏 Path of Exile Divination Cards Flipper
 
-This project provides a tool to assist with flipping divination cards in Path of Exile.
+![App Screenshot](https://github.com/user-attachments/assets/ced660ad-a6e3-4f22-b7b3-4e931c825f93)
+*Smart tool for maximizing profit from divination cards in Path of Exile*
 
-![image](https://github.com/user-attachments/assets/43c149d0-6ded-42db-be00-98bfa0ad9e73)
+---
 
+## ✨ Features
+- Direct data integration with poe.ninja
+- Intuitive interface with profit-based sorting
+- One-click trade site links
+- Support for all current leagues
 
-
-
-
-
-Install guide:
-1. Install Python 3.8 or higher.
-2. Install the required libraries using pip: `pip install -r requirements.txt`
-3. Run the script: `python main.py`
-4. Ensure that Discord is running.
+## 🚀 Quick Start
 
 **For convenience, a pre-compiled .exe is available in the releases section.  
 Download the latest release here:**  
 👉 https://github.com/ezbooz/Path-of-Exile-divination-cards-flipper-POE/releases
 
+### Prerequisites
+- Python 3.8+
 
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/ezbooz/Path-of-Exile-divination-cards-flipper-POE.git
 
-## Additional Information
-**Acknowledgments:**
+# Install dependencies
+pip install -r requirements.txt
 
-  poe.ninja - for providing divination cards data  
-  github.com/Lejving - for the script for data collection
+# Run the application
+python main.py
 
-
-**Disclaimer:**
-
-  This tool is not an official product of Grinding Gear Games and is not endorsed by them.
+```
